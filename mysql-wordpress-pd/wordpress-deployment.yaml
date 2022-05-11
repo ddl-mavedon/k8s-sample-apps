@@ -2,16 +2,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wordpress
+  name: wordpress # Registers the name "Wordpress" on the cluster DNS. You can ping it using this name.
   labels:
     app: wordpress
 spec:
   ports:
-    - port: 80
+    - port: 80 # Load balancer sits on port 80
   selector:
-    app: wordpress
+    app: wordpress # Proxy traffic (send communication) to pods with the label "wordpress" "frontend"
     tier: frontend
-  type: LoadBalancer
+  type: LoadBalancer # On a public cloud platform like Azure, this tag will provision you a load balancer with a public DNS of the native type for that service
 ---
 # Defines storage
 apiVersion: v1
@@ -27,9 +27,9 @@ spec:
     requests:
       storage: 20Gi
 ---
-# Defines the front end deployment
+# Defines the front end deployment. 
 apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
-kind: Deployment
+kind: Deployment # Tells the app how to deploy as pods.
 metadata:
   name: wordpress
   labels:
@@ -44,7 +44,7 @@ spec:
   template:
     metadata:
       labels:
-        app: wordpress
+        app: wordpress # Labels indicating to load balancer that they should send traffic here
         tier: frontend
     spec:
       containers:
@@ -61,7 +61,7 @@ spec:
               key: password
         ports:
         # More storage
-        - containerPort: 80
+        - containerPort: 80 # Configured to listen on port 80
           name: wordpress
         volumeMounts:
         - name: wordpress-persistent-storage
